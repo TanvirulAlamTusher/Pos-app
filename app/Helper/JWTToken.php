@@ -7,7 +7,7 @@ use Firebase\JWT\Key;
 
 class JWTToken {
 
-   public static function CreateToken($userEmail):string {
+   public static function CreateToken($userEmail,$userId):string {
     $key = env('JWT_KEY');
     
     $payload =[
@@ -20,11 +20,12 @@ class JWTToken {
         //token expair time
         'exp'=> time()+60*60,
      //zar jonno token issu korbo tar mail
-        'userEmail' => $userEmail
+        'userEmail' => $userEmail,
+        'userID' => $userId
    
     ];
 
-     return JWT::encode($payload, $key,'HS256');
+     return JWT::encode($payload,$key,'HS256');
 
 
     }
@@ -43,7 +44,8 @@ class JWTToken {
           //20 min time set
           'exp'=> time()+60*20,
        //zar jonno token issu korbo tar mail
-          'userEmail' => $userEmail
+          'userEmail' => $userEmail,
+          'userID' => '0'
      
       ];
   
@@ -53,16 +55,19 @@ class JWTToken {
 
 
 
-   public static function VerifyToken($token):string {
+   public static function VerifyToken($token):string|object {
 
 
     try{
+      
+   
+
       $key = env('JWT_KEY');
       $decode = JWT::decode($token,new Key($key,'HS256'));
       
       //verify hole $decode theke uporer $payload er property gola pabo
 
-     return $decode->userEmail;
+     return $decode;
 
     }
     catch(Exception $e) {
